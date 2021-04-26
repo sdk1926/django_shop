@@ -20,6 +20,6 @@ class ProductAdmin(admin.ModelAdmin):
         return f'{intcomma(stock)}개'
 
     styled_stock.short_description = '재고'
-    price_format.short_description = '가격'
+    price_format.short_description = '가격.'
 
 admin.site.register(Product, ProductAdmin)
