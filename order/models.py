@@ -8,7 +8,7 @@ class Order(models.Model):
     quantity = models.IntegerField(verbose_name='수량')
     status = models.CharField(
         choices=(
-            ('대기장', '대기중'),
+            ('대기중', '대기중'),
             ('결제대기', '결제대기'),
             ('결제완료', '결제완료'),
             ('환불', '환불')), 

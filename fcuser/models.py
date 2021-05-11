@@ -20,3 +20,4 @@ class Fcuser(models.Model):
         db_table = 'products_user'
         verbose_name = '사용자'
         verbose_name_plural = '사용자'
+
