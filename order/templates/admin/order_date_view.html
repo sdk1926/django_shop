@@ -1,0 +1,61 @@
+{% extends 'admin/base_site.html' %}
+{% load i18n admin_urls static admin_list %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:app_list' app_label='order' %}">
+    주문</a>
+&rsaquo; {{ cl.opts.verbose_name_plural|capfirst }}
+</div>
+{% endblock %}
+
+{% block content %}
+<div id="content-main" class="p-5">
+    <a class="btn btn-primary mb-5" href="/admin/order/order/">
+        돌아가기</a>
+<h3>최근 일주일 주문</h3>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>사용자</th>
+            <th>상품</th>
+            <th>상태</th>
+            <th>일시</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for d in week_data %}
+        <tr>
+            <td>{{ d.fcuser }}</td>
+            <td>{{ d.product }}</td>
+            <td>{{ d.status }}</td>
+            <td>{{ d.register_date }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<h3>과거 주문</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>사용자</th>
+            <th>상품</th>
+            <th>상태</th>
+            <th>일시</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for d in data %}
+        <tr>
+            <td>{{ d.fcuser }}</td>
+            <td>{{ d.product }}</td>
+            <td>{{ d.status }}</td>
+            <td>{{ d.register_date }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+{% endblock %}

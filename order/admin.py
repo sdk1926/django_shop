@@ -2,9 +2,13 @@ from django.contrib.admin.models import LogEntry, CHANGE
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import F, Q
 from django.contrib import admin
+from django.template import context
+from django.template.response import TemplateResponse
+from django.urls import path
 from .models import Order
 from django.db import transaction
 from django.utils.html import format_html
+import datetime
 # Register your models here.
 
 def refund(modeladmin, request, queryset):
@@ -31,6 +35,7 @@ class OrderAdmin(admin.ModelAdmin):
     list_filter = ('status',)
     list_display = ('fcuser', 'product', 'styled_status', 'action')
     change_list_template = 'admin/order_change_list.html'
+    change_form_template = 'admin/order_change_form.html'
     actions = [
         refund
     ]
@@ -61,8 +66,9 @@ class OrderAdmin(admin.ModelAdmin):
         return super().changelist_view(request, extra_context)
     
     def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
-        order = Order.objects.get(pk=object_id)
-        extra_context = { 'title': f"'{order.fcuser.email}'의 '{order.product.name}'주문 수정하기" }
+        extra_context = { 'title': "주문 수정하기" }
+        extra_context['show_save_and_add_another'] = True
+        extra_context['show_save_and_continue'] = True
         return super().changeform_view(request, object_id, form_url, extra_context)
 
     def styled_status(self,obj):
@@ -73,9 +79,28 @@ class OrderAdmin(admin.ModelAdmin):
         return format_html(f'<b>{obj.status}</b>')
 
     def action(self, obj):
+        print(obj)
         if obj.status != '환불':
             return format_html(f'<input type="button" value="환불" onclick="order_refund_submit({obj.id})" class="btn btn-primary btn-sm">')
-            
+
+    def get_urls(self):
+        urls = super().get_urls()
+        date_urls = [
+            path('date_view/', self.date_view),
+        ]
+        return date_urls + urls
+
+    def date_view(self, request):
+        week_date = datetime.datetime.now() - datetime.timedelta(days=7)
+        week_data = Order.objects.filter(register_date__gte=week_date)
+        data = Order.objects.filter(register_date__lt=week_date)
+        context = dict(
+            self.admin_site.each_context(request),
+            week_data=week_data,
+            data=data
+        )
+        return TemplateResponse(request, 'admin/order_date_view.html', context)
+
     styled_status.short_description = '상태'
     
 admin.site.register(Order, OrderAdmin)
